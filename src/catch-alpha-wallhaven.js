@@ -23,8 +23,9 @@ const httpGetUrl = (url, path, body) => {
 
 const matchImgPage = (str) => {
 	const matchList = str.match(/https:\/\/alpha.wallhaven.cc\/wallpaper\/\d+?"/g);
-
+	const pageList = [];
 	matchList.forEach((item) => {
+		const path = item.replace('"', '');
 
 	});
 	// console.log('match list', matchList);
