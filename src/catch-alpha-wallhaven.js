@@ -1,6 +1,9 @@
 const http = require('http');
 const https = require('https');
 
+const multipleAsync = require('./multiple-async');
+const downloadUtil = require('./download-file');
+
 const wallhavenHost = 'https://alpha.wallhaven.cc';
 const searchPath = '/search';
 
@@ -26,9 +29,10 @@ const matchImgPage = (str) => {
 	const pageList = [];
 	matchList.forEach((item) => {
 		const path = item.replace('"', '');
-
+		pageList.push(path);
 	});
-	// console.log('match list', matchList);
+	// console.log('match list', pageList);
+	multipleAsync.getPageList(pageList);
 };
 
 
@@ -52,7 +56,19 @@ const httpCallback = (res) => {
 };
 
 const url = httpGetUrl(wallhavenHost, searchPath, getBody('anime', 1));
-console.log('url = ', url);
-const req = https.get(url, httpCallback);
+// console.log('url = ', url);
+// const req = https.get(url, httpCallback);
+//
+// req.end();
 
-req.end();
+const fileUrl = 'http://vodkgeyttp8.vod.126.net/cloudmusic/432b/core/83de/39d32c31be670c70b6c8c800630f8762.mp4?wsSecret=47234cf4a250d080b8425a4cb5f7920a&wsTime=1548585118';
+const fileName = 'mv.mp4';
+
+const bigVideoUrl = 'http://193.112.89.116:8080/9/1b95ca440c11';
+const bigVidwoName = 'ad.mp4';
+
+const wallpaperUrl = 'https://wallpapers.wallhaven.cc/wallpapers/full/wallhaven-739173.jpg';
+const filename = downloadUtil.getFileNameFromUrl(wallpaperUrl);
+const wallpaperName = './source/'+filename;
+
+downloadUtil.downloadHttps(wallpaperUrl, wallpaperName);
