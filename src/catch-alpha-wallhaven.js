@@ -24,6 +24,42 @@ const httpGetUrl = (url, path, body) => {
 	return getUrl+'?'+bodyStr;
 };
 
+const matchImgUrl = (str) => {
+	const matchList = str.match(/src="\/\/wallpapers\.wallhaven\.cc\S+?\.jpg"/g);
+	if (matchList && matchList[0]) {
+		const result = matchList[0];
+		let imgUrl = result.replace('src="', '').replace('"', '');
+		imgUrl = 'https:'+imgUrl;
+		console.log('img path = ', imgUrl);
+	}
+};
+
+const pageCallback = (res) => {
+	console.log(`STATUS: ${res.statusCode}`);
+	console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
+	const chunks = [];
+
+	res.on('data', (chunk) => {
+		// console.log('data ', chunk);
+		chunks.push(chunk);
+	});
+
+	res.on('end', () => {
+		const body = Buffer.concat(chunks);
+		const htmlString = body.toString();
+		// console.log(htmlString.length);
+		matchImgUrl(htmlString);
+	});
+	res.on('error', (e) => {
+		console.error(`problem with request: ${e.message}`);
+	});
+};
+
+const getImageFromPage = (path) => {
+
+	https.get(path, pageCallback);
+};
+
 const matchImgPage = (str) => {
 	const matchList = str.match(/https:\/\/alpha.wallhaven.cc\/wallpaper\/\d+?"/g);
 	const pageList = [];
