@@ -24,11 +24,11 @@ const getFileNameFromUrl = (url) => {
 const handleDownload = (res, fileName, callback) => {
 	const file = fs.createWriteStream(fileName, {});
 	res.pipe(file);
-	console.log(res.headers);
+	// console.log(res.headers);
 	file.on('finish', () => {
 		file.close();
-		console.log('download finish');
-		if (callback) callback(fileName)
+		// console.log('download finish');
+		if (callback) callback(fileName);
 	}).on('error', (err) => {
 		console.log(err);
 	});
@@ -61,8 +61,16 @@ const readDownloadFile = () => {
 
 };
 
+const getSchemeFromUrl = (url) => {
+	if (url.indexOf('https') === 0) {
+		return 'https';
+	}
+	return 'http';
+};
+
 module.exports = {
 	download,
 	downloadHttps,
 	getFileNameFromUrl,
+	getSchemeFromUrl,
 };

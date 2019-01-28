@@ -35,17 +35,24 @@ const getPageList = (pageList, callback) => {
 };
 
 
-const multiDownload = (scheme = 'http', urlList, callback) => {
+const multiDownload = (urlList, dir,  callback) => {
 	const done = lodash.after(urlList.length, () => {
 		console.log('download '+urlList.length+' file completely');
 		if (callback) callback();
 	});
 	urlList.forEach((url) => {
 		const fileName = downloadUtil.getFileNameFromUrl(url);
+		let filePath;
+		if (dir) {
+			filePath = dir + '/' + fileName;
+		} else {
+			filePath = fileName;
+		}
+		const scheme = downloadUtil.getSchemeFromUrl(url);
 		if (scheme === 'https') {
-			downloadUtil.downloadHttps(url, fileName, done);
+			downloadUtil.downloadHttps(url, filePath, done);
 		} else if (scheme === 'http') {
-			downloadUtil.download(url, fileName, done);
+			downloadUtil.download(url, filePath, done);
 		} else {
 			console.error('scheme unknown');
 			done();

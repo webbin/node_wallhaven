@@ -31,36 +31,12 @@ const matchImgUrl = (str) => {
 		let imgUrl = result.replace('src="', '').replace('"', '');
 		imgUrl = 'https:'+imgUrl;
 		console.log('img path = ', imgUrl);
+		return imgUrl;
 	}
+	return null;
 };
 
-const pageCallback = (res) => {
-	console.log(`STATUS: ${res.statusCode}`);
-	console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
-	const chunks = [];
-
-	res.on('data', (chunk) => {
-		// console.log('data ', chunk);
-		chunks.push(chunk);
-	});
-
-	res.on('end', () => {
-		const body = Buffer.concat(chunks);
-		const htmlString = body.toString();
-		// console.log(htmlString.length);
-		matchImgUrl(htmlString);
-	});
-	res.on('error', (e) => {
-		console.error(`problem with request: ${e.message}`);
-	});
-};
-
-const getImageFromPage = (path) => {
-
-	https.get(path, pageCallback);
-};
-
-const matchImgPage = (str) => {
+const matchImgPage = (str, callback) => {
 	const matchList = str.match(/https:\/\/alpha.wallhaven.cc\/wallpaper\/\d+?"/g);
 	const pageList = [];
 	matchList.forEach((item) => {
@@ -68,34 +44,45 @@ const matchImgPage = (str) => {
 		pageList.push(path);
 	});
 	// console.log('match list', pageList);
-	multipleAsync.getPageList(pageList);
-};
-
-
-const httpCallback = (res) => {
-	console.log(`STATUS: ${res.statusCode}`);
-	console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
-	const chunks = [];
-
-	res.on('data', (chunk) => {
-		// console.log('data ', chunk);
-		chunks.push(chunk);
-	});
-
-	res.on('end', () => {
-		const body = Buffer.concat(chunks);
-		matchImgPage(body.toString());
-	});
-	res.on('error', (e) => {
-		console.error(`problem with request: ${e.message}`);
+	multipleAsync.getPageList(pageList, (htmlList) => {
+		const imgUrlList = [];
+		htmlList.forEach((html) => {
+			const imgUrl = matchImgUrl(html);
+			if (imgUrl) imgUrlList.push(imgUrl);
+		});
+		// console.log(imgUrlList.length);
+		if (callback) callback(imgUrlList);
 	});
 };
 
-const url = httpGetUrl(wallhavenHost, searchPath, getBody('anime', 1));
-// console.log('url = ', url);
-// const req = https.get(url, httpCallback);
-//
-// req.end();
+const startGetImgFile = (page = 1) => {
+	if (page > 10) return;
+	const dir = './source';
+	const url = httpGetUrl(wallhavenHost, searchPath, getBody('anime', page));
+	// console.log('url = ', url);
+	const req = https.get(url, (res) => {
+		const chunks = [];
+		res.on('data', (chunk) => {
+			// console.log('data ', chunk);
+			chunks.push(chunk);
+		});
+
+		res.on('end', () => {
+			const body = Buffer.concat(chunks);
+			const html = body.toString();
+			matchImgPage(html, (urlList) => {
+				multipleAsync.multiDownload(urlList, dir,() => {
+					console.log('download complete ');
+					startGetImgFile(page + 1);
+				});
+			});
+		});
+		res.on('error', (e) => {
+			console.error(`${url} problem with request: ${e.message}`);
+		});
+	});
+	req.end();
+};
 
 const fileUrl = 'http://vodkgeyttp8.vod.126.net/cloudmusic/432b/core/83de/39d32c31be670c70b6c8c800630f8762.mp4?wsSecret=47234cf4a250d080b8425a4cb5f7920a&wsTime=1548585118';
 const fileName = 'mv.mp4';
@@ -107,4 +94,5 @@ const wallpaperUrl = 'https://wallpapers.wallhaven.cc/wallpapers/full/wallhaven-
 const filename = downloadUtil.getFileNameFromUrl(wallpaperUrl);
 const wallpaperName = './source/'+filename;
 
-downloadUtil.downloadHttps(wallpaperUrl, wallpaperName);
+// downloadUtil.downloadHttps(wallpaperUrl, wallpaperName);
+startGetImgFile();
