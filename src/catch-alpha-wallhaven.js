@@ -3,6 +3,7 @@ const https = require('https');
 
 const multipleAsync = require('./multiple-async');
 const downloadUtil = require('./download-file');
+const httpUtil = require('./http-util');
 
 const wallhavenHost = 'https://alpha.wallhaven.cc';
 const searchPath = '/search';
@@ -12,16 +13,6 @@ const getBody = (query, page) => {
 		q: query,
 		page,
 	};
-};
-
-const httpGetUrl = (url, path, body) => {
-	const getUrl = url + path;
-	let bodyStr = '';
-	const keys = Object.keys(body);
-	keys.forEach((k) => {
-		bodyStr += k+'='+body[k]+'&';
-	});
-	return getUrl+'?'+bodyStr;
 };
 
 const matchImgUrl = (str) => {
@@ -43,14 +34,14 @@ const matchImgPage = (str, callback) => {
 		const path = item.replace('"', '');
 		pageList.push(path);
 	});
-	// console.log('match list', pageList);
+	console.log('match list', pageList.length);
 	multipleAsync.getPageList(pageList, (htmlList) => {
 		const imgUrlList = [];
 		htmlList.forEach((html) => {
 			const imgUrl = matchImgUrl(html);
 			if (imgUrl) imgUrlList.push(imgUrl);
 		});
-		// console.log(imgUrlList.length);
+		console.log(imgUrlList.length);
 		if (callback) callback(imgUrlList);
 	});
 };
@@ -58,9 +49,9 @@ const matchImgPage = (str, callback) => {
 const startGetImgFile = (page = 1) => {
 	if (page > 10) return;
 	const dir = './source';
-	const url = httpGetUrl(wallhavenHost, searchPath, getBody('anime', page));
-	// console.log('url = ', url);
-	const req = https.get(url, (res) => {
+	const url = httpUtil.httpGetUrl(wallhavenHost, searchPath, getBody('anime', page));
+	console.log('url = ', url);
+	https.get(url, (res) => {
 		const chunks = [];
 		res.on('data', (chunk) => {
 			// console.log('data ', chunk);
@@ -81,7 +72,6 @@ const startGetImgFile = (page = 1) => {
 			console.error(`${url} problem with request: ${e.message}`);
 		});
 	});
-	req.end();
 };
 
 const fileUrl = 'http://vodkgeyttp8.vod.126.net/cloudmusic/432b/core/83de/39d32c31be670c70b6c8c800630f8762.mp4?wsSecret=47234cf4a250d080b8425a4cb5f7920a&wsTime=1548585118';

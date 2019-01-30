@@ -1,11 +1,12 @@
 const lodash = require('lodash');
 const https = require('https');
+const http = require('http');
 
 const downloadUtil = require('./download-file');
 
 
 const pageHtmlCallback = (res, list, done) => {
-	// console.log(`STATUS: ${res.statusCode}`);
+	console.log(`STATUS: ${res.statusCode}`);
 	// console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
 	const chunks = [];
 	res.on('data', (chunk) => {
@@ -20,6 +21,7 @@ const pageHtmlCallback = (res, list, done) => {
 	});
 	res.on('error', (e) => {
 		console.error(`problem with request: ${e.message}`);
+		done();
 	});
 };
 
@@ -30,7 +32,18 @@ const getPageList = (pageList, callback) => {
 		callback(pageHtmlList);
 	});
 	pageList.forEach((url) => {
-		https.get(url, (res) => pageHtmlCallback(res, pageHtmlList, done))
+		https.get(url, (res) => pageHtmlCallback(res, pageHtmlList, done));
+	});
+};
+
+const getHttpPageList = (pageList, callback) => {
+	const pageHtmlList = [];
+	const done = lodash.after(pageList.length, () => {
+		console.log('page count = ', pageHtmlList.length);
+		callback(pageHtmlList);
+	});
+	pageList.forEach((url) => {
+		http.get(url, (res) => pageHtmlCallback(res, pageHtmlList, done));
 	});
 };
 
@@ -63,4 +76,5 @@ const multiDownload = (urlList, dir,  callback) => {
 module.exports = {
 	getPageList,
 	multiDownload,
+	getHttpPageList,
 };
