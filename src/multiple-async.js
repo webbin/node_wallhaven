@@ -6,7 +6,10 @@ const downloadUtil = require('./download-file');
 
 
 const pageHtmlCallback = (res, list, done) => {
-	console.log(`STATUS: ${res.statusCode}`);
+	if (res.statusCode !== 200) {
+		console.log(`STATUS: ${res.statusCode}`);
+	}
+	// console.log('page html current length = ', list.length);
 	// console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
 	const chunks = [];
 	res.on('data', (chunk) => {
@@ -31,8 +34,17 @@ const getPageList = (pageList, callback) => {
 		console.log('page count = ', pageHtmlList.length);
 		callback(pageHtmlList);
 	});
+
 	pageList.forEach((url) => {
-		https.get(url, (res) => pageHtmlCallback(res, pageHtmlList, done));
+		const req = https.get(url, (res) => pageHtmlCallback(res, pageHtmlList, done));
+		req.on('timeout', () => {
+			done();
+			console.log('time out');
+		});
+		req.on('error',() => {
+			done();
+			console.log('req error');
+		})
 	});
 };
 
@@ -43,7 +55,11 @@ const getHttpPageList = (pageList, callback) => {
 		callback(pageHtmlList);
 	});
 	pageList.forEach((url) => {
-		http.get(url, (res) => pageHtmlCallback(res, pageHtmlList, done));
+		const req = http.get(url, (res) => pageHtmlCallback(res, pageHtmlList, done));
+		req.on('timeout', () => {
+			console.log('time out');
+			done();
+		});
 	});
 };
 

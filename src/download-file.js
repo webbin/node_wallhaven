@@ -45,6 +45,11 @@ const downloadHttps = (fileUrl, destFileName, callback) => {
 	if (!destFileName) {
 		fileName = getFileNameFromUrl(fileUrl);
 	}
+	const isExist = fs.existsSync(fileName);
+	if (isExist) {
+		console.log('file exist ', fileName);
+		callback();
+	}
 	https.get(fileUrl, (res) => handleDownload(res, fileName, callback));
 
 };
@@ -53,6 +58,11 @@ const download = (fileUrl, destFileName, callback) => {
 	let fileName = destFileName;
 	if (!destFileName) {
 		fileName = getFileNameFromUrl(fileUrl);
+	}
+	const isExist = fs.existsSync(fileName);
+	if (isExist) {
+		console.log('file exist ', fileName);
+		callback();
 	}
 	http.get(fileUrl, (res) => handleDownload(res, fileName, callback));
 };

@@ -1,5 +1,6 @@
 const http = require('http');
 const https = require('https');
+const fs = require('fs');
 
 const multipleAsync = require('./multiple-async');
 const downloadUtil = require('./download-file');
@@ -21,20 +22,25 @@ const matchImgUrl = (str) => {
 		const result = matchList[0];
 		let imgUrl = result.replace('src="', '').replace('"', '');
 		imgUrl = 'https:'+imgUrl;
-		console.log('img path = ', imgUrl);
+		// console.log('img path = ', imgUrl);
 		return imgUrl;
 	}
 	return null;
 };
 
-const matchImgPage = (str, callback) => {
+const getPageListFromEnterPage = (str) => {
 	const matchList = str.match(/https:\/\/alpha.wallhaven.cc\/wallpaper\/\d+?"/g);
 	const pageList = [];
 	matchList.forEach((item) => {
 		const path = item.replace('"', '');
 		pageList.push(path);
 	});
-	console.log('match list', pageList.length);
+	return pageList;
+};
+
+const matchImgPage = (str, callback) => {
+	const pageList = getPageListFromEnterPage(str);
+	// console.log('match page list', pageList.length);
 	multipleAsync.getPageList(pageList, (htmlList) => {
 		const imgUrlList = [];
 		htmlList.forEach((html) => {
@@ -47,7 +53,7 @@ const matchImgPage = (str, callback) => {
 };
 
 const startGetImgFile = (page = 1) => {
-	if (page > 10) return;
+	if (page > 3) return;
 	const dir = './source';
 	const url = httpUtil.httpGetUrl(wallhavenHost, searchPath, getBody('anime', page));
 	console.log('url = ', url);
@@ -62,6 +68,7 @@ const startGetImgFile = (page = 1) => {
 			const body = Buffer.concat(chunks);
 			const html = body.toString();
 			matchImgPage(html, (urlList) => {
+				console.log('url to download ', urlList);
 				multipleAsync.multiDownload(urlList, dir,() => {
 					console.log('download complete ');
 					startGetImgFile(page + 1);
@@ -85,4 +92,53 @@ const filename = downloadUtil.getFileNameFromUrl(wallpaperUrl);
 const wallpaperName = './source/'+filename;
 
 // downloadUtil.downloadHttps(wallpaperUrl, wallpaperName);
-startGetImgFile();
+// startGetImgFile();
+
+
+const onfetchPageResult = (result) => {
+	// console.log('fetch page end ', result.length);
+	const imgUrl = matchImgUrl(result);
+	if (imgUrl) {
+		const fileName = downloadUtil.getFileNameFromUrl(imgUrl);
+		const filePath = './source/'+fileName;
+		const isExist = fs.existsSync(filePath);
+		if (!isExist) {
+			downloadUtil.downloadHttps(imgUrl, filePath, () => {
+				console.log('this file not exist, download done ', fileName);
+			});
+		}
+	}
+};
+
+const matchUrlInPage = (result) => {
+	const pageList = getPageListFromEnterPage(result);
+	pageList.forEach((url) => {
+		const req = https.get(url, httpUtil.invokeHttpCallback(onfetchPageResult));
+		req.on('information', (res) => {
+			console.log(`Got information prior to main response: ${res.statusCode}`);
+		});
+		req.on('abort', (res) => {
+			console.log(`on request abort : ${res.statusCode}`);
+		});
+		req.on('timeout', (res) => {
+			console.log(`on request timeout : ${res.statusCode}`);
+		});
+	});
+};
+
+const testWallHavenNetwork = (page = 1) => {
+	const url = httpUtil.httpGetUrl(wallhavenHost, searchPath, getBody('anime', page));
+	console.log('test page url = ', url);
+	const req = https.get(url, httpUtil.invokeHttpCallback(matchUrlInPage));
+	req.on('information', (res) => {
+		console.log(`Got information prior to main response: ${res.statusCode}`);
+	});
+	req.on('abort', (res) => {
+		console.log(`on request abort : ${res.statusCode}`);
+	});
+	req.on('timeout', (res) => {
+		console.log(`on request timeout : ${res.statusCode}`);
+	});
+};
+
+testWallHavenNetwork();

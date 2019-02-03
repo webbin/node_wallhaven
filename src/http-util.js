@@ -18,15 +18,14 @@ const httpGetUrl = (url, path, body) => {
 };
 
 const invokeHttpCallback = (callback) => (res) => {
-    console.log(`STATUS: ${res.statusCode}`);
+    if (res.statusCode !== 200) {
+        console.log(`STATUS: ${res.statusCode}`);
+    }
     // console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
     const chunks = [];
     res.on('data', (chunk) => {
-        console.log('on data ');
+        // console.log('on data ');
         chunks.push(chunk);
-    });
-    res.on('abort', () => {
-        console.log('on abort ');
     });
     res.on('end', () => {
         const body = Buffer.concat(chunks);

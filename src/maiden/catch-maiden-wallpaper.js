@@ -25,14 +25,13 @@ const onGetMultiPage = (urlList, htmlList) => {
     htmlList.forEach((htmlStr, index) => {
         if (index === 0) {
             const pageUrl = urlList[index];
-            const regText = pageUrl+'\\S+\"';
+            const regText = pageUrl+'\\S+?\"';
             console.log('reg text ', regText);
             const reg = new RegExp(regText);
             const matchResult = htmlStr.match(reg);
 
             console.log('match result ', matchResult);
         }
-
     });
 };
 
@@ -49,8 +48,7 @@ const catchWallpaper = (page = 1) => {
     const destUrl = httpUtil.httpGetUrl(url, path, body);
     console.log('get url = ', destUrl);
     const callback = httpUtil.invokeHttpCallback(onReqEnd);
-    const req = http.get(destUrl, callback);
-    req.end();
+    http.get(destUrl, callback);
 };
 
 catchWallpaper();
