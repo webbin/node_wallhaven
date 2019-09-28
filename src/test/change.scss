@@ -1,0 +1,12 @@
+
+$size: 877px;
+
+.pocket {
+  width: 99px;
+  height: 90px;
+}
+
+
+@media screen and (max-device-height: 90px) {
+  .pocket { height: $size }
+}
