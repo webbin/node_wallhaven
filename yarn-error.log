@@ -1,0 +1,37 @@
+Arguments: 
+  D:\nodejs\node.exe C:\Users\Administrator\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js add axios
+
+PATH: 
+  C:\Users\Administrator\bin;D:\Applications\Git\mingw64\bin;D:\Applications\Git\usr\local\bin;D:\Applications\Git\usr\bin;D:\Applications\Git\usr\bin;D:\Applications\Git\mingw64\bin;D:\Applications\Git\usr\bin;C:\Users\Administrator\bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0;C:\Windows\System32\OpenSSH;D:\nodejs;D:\Applications\Microsoft VS Code\bin;D:\Applications\Git\cmd;C:\Users\Administrator\AppData\Local\Android\Sdk\platform-tools;C:\Users\Administrator\AppData\Local\Android\Sdk\emulator;C:\Users\Administrator\AppData\Local\Android\Sdk\tools;D:\Applications\Sublime Text;D:\Applications\wechatDevTools\dll;C:\Users\Administrator\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Users\Administrator\AppData\Local\Microsoft\WindowsApps;C:\Users\Administrator\AppData\Roaming\npm;D:\Applications\Git\usr\bin\vendor_perl;D:\Applications\Git\usr\bin\core_perl
+
+Yarn version: 
+  1.22.19
+
+Node version: 
+  16.15.1
+
+Platform: 
+  win32 x64
+
+Trace: 
+  SyntaxError: D:\Projects\JsProjects\node_wallhaven\package.json: Unexpected token } in JSON at position 100
+      at JSON.parse (<anonymous>)
+      at C:\Users\Administrator\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:1629:59
+      at Generator.next (<anonymous>)
+      at step (C:\Users\Administrator\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:310:30)
+      at C:\Users\Administrator\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:321:13
+
+npm manifest: 
+  {
+    "name": "node_wallhaven",
+    "version": "1.0.0",
+    "dependencies": {
+      "lodash": "^4.17.11",
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
