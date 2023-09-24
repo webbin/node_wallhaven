@@ -112,14 +112,10 @@ const searchArticals = async () => {
 
       msgid = last.msgid;
       idx = last.itemidx;
-
       // endtime = 0;
     }
-
     // console.log(articals);
-
     fs.writeFileSync('./data.json', JSON.stringify(result));
-
   } catch (error) {
     console.log(error);
   }

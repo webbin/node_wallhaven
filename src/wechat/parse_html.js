@@ -100,6 +100,7 @@ const urlParser = async (url, keywords) => {
       for (let j = 0; j < keywords.length; j += 1) {
         const key = keywords[j];
         if (text.indexOf(key) > 0) {
+          items.unshift(url);
           list.push(items);
           break;
         }
