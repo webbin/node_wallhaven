@@ -1,3 +1,8 @@
 node_modules
 .idea
 src/source
+report-detail.json
+task-detail.json
+code-main-list.json
+code-sub-list.json
+result.xlsx

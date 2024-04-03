@@ -1,9 +1,9 @@
 const fs = require("fs");
 
-const { getDetailByMainCode, getResultBySubCode } = require("./main");
+const { getDetailByMainCode, getResultBySubCode } = require("../main");
 
-const allMainCode = require("./code-main-list.json");
-const allSubCode = require("./code-sub-list.json");
+const allMainCode = require("../code-main-list.json");
+const allSubCode = require("../code-sub-list.json");
 
 const saveTaskDetailLoop = async (index = 0, list = []) => {
   if (index >= allMainCode.length) return list;
